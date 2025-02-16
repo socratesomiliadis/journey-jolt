@@ -40,10 +40,10 @@ async function saveHotelBooking(
     );
     const jsonData = (await response.json()) as HotelResponse;
 
-    type newBookingHotel = typeof bookingHotel.$inferInsert;
+    type bookingHotelInsertType = typeof bookingHotel.$inferInsert;
 
-    const newBookingHotel: newBookingHotel = {
-      id: bookingId,
+    const newBookingHotelRecord: bookingHotelInsertType = {
+      id: jsonData.data.id,
       bookingId: bookingId,
       hotelRoomId: jsonData.data.id,
       checkInDate: new Date(
@@ -61,9 +61,9 @@ async function saveHotelBooking(
 
     const result = await db
       .insert(bookingHotel)
-      .values(newBookingHotel)
+      .values(newBookingHotelRecord)
       .returning();
-    console.log("Successfully saved hotel booking data");
+    console.log("Successfully saved hotel booking data", result);
   } catch (error) {
     console.error("Error saving hotel booking:", error);
     throw error;
