@@ -40,20 +40,28 @@ async function saveHotelBooking(
     );
     const jsonData = (await response.json()) as HotelResponse;
 
+    type newBookingHotel = typeof bookingHotel.$inferInsert;
+
+    const newBookingHotel: newBookingHotel = {
+      id: bookingId,
+      bookingId: bookingId,
+      hotelRoomId: jsonData.data.id,
+      checkInDate: new Date(
+        jsonData.data.hotelBookings[0].hotelOffer.checkInDate
+      ),
+      checkOutDate: new Date(
+        jsonData.data.hotelBookings[0].hotelOffer.checkOutDate
+      ),
+      numberOfRooms: jsonData.data.hotelBookings[0].hotelOffer.roomQuantity,
+      pricePerNight: jsonData.data.hotelBookings[0].hotelOffer.price.base,
+      priceCurrency: jsonData.data.hotelBookings[0].hotelOffer.price.currency,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
     const result = await db
       .insert(bookingHotel)
-      .values({
-        id: jsonData.data.id,
-        bookingId: bookingId,
-        hotelRoomId: jsonData.data.id,
-        checkInDate: jsonData.data.hotelBookings[0].hotelOffer.checkInDate,
-        checkOutDate: jsonData.data.hotelBookings[0].hotelOffer.checkOutDate,
-        numberOfRooms: jsonData.data.hotelBookings[0].hotelOffer.roomQuantity,
-        pricePerNight: jsonData.data.hotelBookings[0].hotelOffer.price.base,
-        priceCurrency: jsonData.data.hotelBookings[0].hotelOffer.price.currency,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
+      .values(newBookingHotel)
       .returning();
     console.log("Successfully saved hotel booking data");
   } catch (error) {
