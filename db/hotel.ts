@@ -1,68 +1,69 @@
 import { eq } from "drizzle-orm";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { hotelRooms, bookingHotels } from "./tempMockData/mockHotelData";
 import {
   booking,
-  hotel,
   hotelRoom,
   bookingHotel,
   passenger,
   passengerRoom,
   user,
 } from "./schema";
-
-//returned froom amadeus API when a call is made to Create Hotel Order
-interface HotelResponse {
-  data: {
-    id: string;
-    hotelBookings: [
-      {
-        hotelOffer: {
-          checkInDate: string;
-          checkOutDate: string;
-          price: {
-            base: string;
-            currency: string;
-          };
-          roomQuantity: number;
-        };
-      }
-    ];
-  };
-}
+import { uuid } from "drizzle-orm/pg-core";
 
 async function saveHotelBooking(
   db: PostgresJsDatabase,
-  bookingId: string
+  bookingId: string,
+  hotelNumber: number,
+  roomNumber: number
 ): Promise<void> {
   try {
-    const response = await fetch(
-      `http://test.api.amadeus.com/v2/booking/hotel-orders/${bookingId}`
-    );
-    const jsonData = (await response.json()) as HotelResponse;
+    //TODO remove if no API is used or update with the correct API route
+    const response = await fetch("");
 
+    //TODO create hotelTypes in types fodler for coressponding interfaces or use mock data
     type bookingHotelInsertType = typeof bookingHotel.$inferInsert;
+    type hotelRoomInsertType = typeof hotelRoom.$inferInsert;
 
+    //based on mock data found in coressponfing folder
     const newBookingHotelRecord: bookingHotelInsertType = {
-      id: jsonData.data.id,
-      bookingId: bookingId,
-      hotelRoomId: jsonData.data.id,
-      checkInDate: new Date(
-        jsonData.data.hotelBookings[0].hotelOffer.checkInDate
-      ),
-      checkOutDate: new Date(
-        jsonData.data.hotelBookings[0].hotelOffer.checkOutDate
-      ),
-      numberOfRooms: jsonData.data.hotelBookings[0].hotelOffer.roomQuantity,
-      pricePerNight: jsonData.data.hotelBookings[0].hotelOffer.price.base,
-      priceCurrency: jsonData.data.hotelBookings[0].hotelOffer.price.currency,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      id: bookingHotels[hotelNumber].id,
+      bookingId: bookingHotels[hotelNumber].bookingId,
+      hotelRoomId: bookingHotels[hotelNumber].hotelRoomId,
+      name: bookingHotels[hotelNumber].name,
+      address: bookingHotels[hotelNumber].address,
+      city: bookingHotels[hotelNumber].city,
+      country: bookingHotels[hotelNumber].country,
+      starRating: bookingHotels[hotelNumber].starRating,
+      checkInDate: bookingHotels[hotelNumber].checkInDate,
+      checkOutDate: bookingHotels[hotelNumber].checkOutDate,
+      numberOfRooms: bookingHotels[hotelNumber].numberOfRooms,
+      pricePerNight: bookingHotels[hotelNumber].pricePerNight,
+      priceCurrency: bookingHotels[hotelNumber].priceCurrency,
+      createdAt: bookingHotels[hotelNumber].createdAt,
+      updatedAt: bookingHotels[hotelNumber].updatedAt,
     };
-    const result = await db
+
+    const newHotelRoomRecord: hotelRoomInsertType = {
+      id: hotelRooms[roomNumber].id,
+      roomType: hotelRooms[roomNumber].roomType,
+      description: hotelRooms[roomNumber].description,
+      maxOccupancy: hotelRooms[roomNumber].maxOccupancy,
+      createdAt: hotelRooms[roomNumber].createdAt,
+      updatedAt: hotelRooms[roomNumber].updatedAt,
+    };
+
+    const bookingHotelResult = await db
       .insert(bookingHotel)
       .values(newBookingHotelRecord)
       .returning();
-    console.log("Successfully saved hotel booking data", result);
+    console.log("Successfully saved booking hotel data", bookingHotelResult);
+
+    const hotelRoomResult = await db
+      .insert(hotelRoom)
+      .values(newHotelRoomRecord)
+      .returning();
+    console.log("Successfully saved hotel room data", hotelRoomResult);
   } catch (error) {
     console.error("Error saving hotel booking:", error);
     throw error;

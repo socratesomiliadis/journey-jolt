@@ -94,10 +94,10 @@ export const passenger = pgTable("passenger", {
     .references(() => user.id, { onDelete: "cascade" }),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
-  dateOfBirth: timestamp("date_of_birth").notNull(),
+  dateOfBirth: text("date_of_birth").notNull(),
   nationality: text("nationality").notNull(),
   passportNumber: text("passport_number").notNull(),
-  passportExpiry: timestamp("passport_expiry").notNull(),
+  passportExpiry: text("passport_expiry").notNull(),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
 });
@@ -113,7 +113,7 @@ export const booking = pgTable("booking", {
   totalAmount: decimal("total_amount").notNull(),
   currency: text("currency").notNull(),
   paymentStatus: text("payment_status").notNull(),
-  bookingDate: timestamp("booking_date").notNull(),
+  bookingDate: text("booking_date").notNull(),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
 });
@@ -137,8 +137,8 @@ export const flight = pgTable("flight", {
   airline: text("airline").notNull(),
   departureAirport: text("departure_airport").notNull(),
   arrivalAirport: text("arrival_airport").notNull(),
-  departureTime: timestamp("departure_time").notNull(),
-  arrivalTime: timestamp("arrival_time").notNull(),
+  departureTime: text("departure_time").notNull(),
+  arrivalTime: text("arrival_time").notNull(),
   aircraftType: text("aircraft_type"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
@@ -173,22 +173,8 @@ export const passengerFlight = pgTable("passenger_flight", {
   updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const hotel = pgTable("hotel", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  address: text("address").notNull(),
-  city: text("city").notNull(),
-  country: text("country").notNull(),
-  starRating: integer("star_rating"),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
-});
-
 export const hotelRoom = pgTable("hotel_room", {
   id: text("id").primaryKey(),
-  hotelId: text("hotel_id")
-    .notNull()
-    .references(() => hotel.id, { onDelete: "cascade" }),
   roomType: text("room_type").notNull(),
   description: text("description"),
   maxOccupancy: integer("max_occupancy").notNull(),
@@ -204,8 +190,13 @@ export const bookingHotel = pgTable("booking_hotel", {
   hotelRoomId: text("hotel_room_id")
     .notNull()
     .references(() => hotelRoom.id, { onDelete: "cascade" }),
-  checkInDate: timestamp("check_in_date").notNull(),
-  checkOutDate: timestamp("check_out_date").notNull(),
+  name: text("name").notNull(),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  country: text("country").notNull(),
+  starRating: integer("star_rating"),
+  checkInDate: text("check_in_date").notNull(),
+  checkOutDate: text("check_out_date").notNull(),
   numberOfRooms: integer("number_of_rooms").notNull(),
   pricePerNight: decimal("price_per_night").notNull(),
   priceCurrency: text("price_currency").notNull(),
