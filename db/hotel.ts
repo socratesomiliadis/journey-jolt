@@ -9,8 +9,8 @@ import {
   passengerRoom,
   user,
 } from "./schema";
-import { uuid } from "drizzle-orm/pg-core";
 
+//returned froom amadeus API when a call is made to Create Hotel Order
 interface HotelResponse {
   data: {
     id: string;
@@ -58,7 +58,6 @@ async function saveHotelBooking(
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-
     const result = await db
       .insert(bookingHotel)
       .values(newBookingHotelRecord)

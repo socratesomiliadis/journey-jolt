@@ -22,7 +22,7 @@ export const user = pgTable("user", {
 export const paymentInfo = pgTable("payment_info", {
   id: serial("id").primaryKey(),
   // Foreign key to the users table.
-  userId: integer("user_id")
+  userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   // Token used as a secure alias/reference for the card data
