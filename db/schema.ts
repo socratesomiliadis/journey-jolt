@@ -5,6 +5,8 @@ import {
   timestamp,
   boolean,
   decimal,
+  serial,
+  varchar,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -15,6 +17,34 @@ export const user = pgTable("user", {
   image: text("image"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
+});
+
+export const paymentInfo = pgTable("payment_info", {
+  id: serial("id").primaryKey(),
+  // Foreign key to the users table.
+  userId: integer("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  // Token used as a secure alias/reference for the card data
+  token: varchar("token", { length: 255 }),
+  // The encrypted credit card number
+  encryptedCardNumber: text("encrypted_card_number"),
+  // Initialization vector for AES encryption
+  iv: text("iv"),
+  // Card type (e.g., Visa, MasterCard, etc.)
+  cardType: varchar("card_type", { length: 50 }),
+  // The last 4 digits of the card number (used for display/reference)
+  last4: varchar("last4", { length: 4 }),
+  // Timestamp when the record was created
+  createdAt: timestamp("created_at", {
+    mode: "string",
+    precision: 3,
+  }).defaultNow(),
+  // Timestamp when the record was last updated
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    precision: 3,
+  }).defaultNow(),
 });
 
 export const session = pgTable("session", {
@@ -101,7 +131,6 @@ export const bookingPassenger = pgTable("booking_passenger", {
   updatedAt: timestamp("updated_at").notNull(),
 });
 
-// Flight related tables
 export const flight = pgTable("flight", {
   id: text("id").primaryKey(),
   flightNumber: text("flight_number").notNull(),
@@ -144,7 +173,6 @@ export const passengerFlight = pgTable("passenger_flight", {
   updatedAt: timestamp("updated_at").notNull(),
 });
 
-// Hotel related tables
 export const hotel = pgTable("hotel", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
