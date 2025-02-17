@@ -1,3 +1,4 @@
+import { alias } from "drizzle-orm/mysql-core";
 import {
   pgTable,
   text,
@@ -102,6 +103,7 @@ export const passenger = pgTable("passenger", {
   nationality: text("nationality").notNull(),
   passportNumber: text("passport_number").notNull(),
   passportExpiry: text("passport_expiry").notNull(),
+  alias: text("alias").array().notNull().default([]),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
