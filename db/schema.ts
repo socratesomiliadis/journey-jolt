@@ -5,7 +5,6 @@ import {
   timestamp,
   boolean,
   decimal,
-  serial,
   varchar,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";

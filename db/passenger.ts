@@ -1,9 +1,9 @@
-import { eq } from "drizzle-orm";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { passenger } from "./schema";
-import { uuid } from "drizzle-orm/pg-core";
 
-async function savePaymentInfo(
+//saves passenger data to the database when called
+//is called at the passenger registration page
+async function savePassengerInfo(
   db: PostgresJsDatabase,
   data: any
 ): Promise<void> {

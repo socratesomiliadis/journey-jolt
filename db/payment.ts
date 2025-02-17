@@ -1,8 +1,8 @@
-import { eq } from "drizzle-orm";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { paymentInfo } from "./schema";
-import { uuid } from "drizzle-orm/pg-core";
 
+//saves payment data for current user to the database when called
+//is called at the corresponding payment info page
 async function savePaymentInfo(
   db: PostgresJsDatabase,
   data: any

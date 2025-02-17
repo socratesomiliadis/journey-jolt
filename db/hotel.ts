@@ -1,15 +1,9 @@
-import { eq } from "drizzle-orm";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { hotelRooms, bookingHotels } from "./tempMockData/mockHotelData";
 import {
-  booking,
   hotelRoom,
   bookingHotel,
-  passenger,
-  passengerRoom,
-  user,
 } from "./schema";
-import { uuid } from "drizzle-orm/pg-core";
 
 async function saveHotelBooking(
   db: PostgresJsDatabase,
