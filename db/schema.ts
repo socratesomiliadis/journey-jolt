@@ -8,6 +8,7 @@ import {
   serial,
   varchar,
 } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -17,34 +18,6 @@ export const user = pgTable("user", {
   image: text("image"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
-});
-
-export const paymentInfo = pgTable("payment_info", {
-  id: serial("id").primaryKey(),
-  // Foreign key to the users table.
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  // Token used as a secure alias/reference for the card data
-  token: varchar("token", { length: 255 }),
-  // The encrypted credit card number
-  encryptedCardNumber: text("encrypted_card_number"),
-  // Initialization vector for AES encryption
-  iv: text("iv"),
-  // Card type (e.g., Visa, MasterCard, etc.)
-  cardType: varchar("card_type", { length: 50 }),
-  // The last 4 digits of the card number (used for display/reference)
-  last4: varchar("last4", { length: 4 }),
-  // Timestamp when the record was created
-  createdAt: timestamp("created_at", {
-    mode: "string",
-    precision: 3,
-  }).defaultNow(),
-  // Timestamp when the record was last updated
-  updatedAt: timestamp("updated_at", {
-    mode: "string",
-    precision: 3,
-  }).defaultNow(),
 });
 
 export const session = pgTable("session", {
@@ -87,8 +60,40 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at"),
 });
 
+export const paymentInfo = pgTable("payment_info", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
+  // Foreign key to the users table.
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  // Token used as a secure alias/reference for the card data
+  token: varchar("token", { length: 255 }),
+  // The encrypted credit card number
+  encryptedCardNumber: text("encrypted_card_number"),
+  // Initialization vector for AES encryption
+  iv: text("iv"),
+  // Card type (e.g., Visa, MasterCard, etc.)
+  cardType: varchar("card_type", { length: 50 }),
+  // The last 4 digits of the card number (used for display/reference)
+  last4: varchar("last4", { length: 4 }),
+  // Timestamp when the record was created
+  createdAt: timestamp("created_at", {
+    mode: "string",
+    precision: 3,
+  }).defaultNow(),
+  // Timestamp when the record was last updated
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    precision: 3,
+  }).defaultNow(),
+});
+
 export const passenger = pgTable("passenger", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
@@ -98,12 +103,14 @@ export const passenger = pgTable("passenger", {
   nationality: text("nationality").notNull(),
   passportNumber: text("passport_number").notNull(),
   passportExpiry: text("passport_expiry").notNull(),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const booking = pgTable("booking", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
@@ -114,12 +121,14 @@ export const booking = pgTable("booking", {
   currency: text("currency").notNull(),
   paymentStatus: text("payment_status").notNull(),
   bookingDate: text("booking_date").notNull(),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const bookingPassenger = pgTable("booking_passenger", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   bookingId: text("booking_id")
     .notNull()
     .references(() => booking.id, { onDelete: "cascade" }),
@@ -127,12 +136,14 @@ export const bookingPassenger = pgTable("booking_passenger", {
     .notNull()
     .references(() => passenger.id, { onDelete: "cascade" }),
   isPrimary: boolean("is_primary").notNull(),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const flight = pgTable("flight", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   flightNumber: text("flight_number").notNull(),
   airline: text("airline").notNull(),
   departureAirport: text("departure_airport").notNull(),
@@ -140,12 +151,14 @@ export const flight = pgTable("flight", {
   departureTime: text("departure_time").notNull(),
   arrivalTime: text("arrival_time").notNull(),
   aircraftType: text("aircraft_type"),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const bookingFlight = pgTable("booking_flight", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   bookingId: text("booking_id")
     .notNull()
     .references(() => booking.id, { onDelete: "cascade" }),
@@ -155,12 +168,14 @@ export const bookingFlight = pgTable("booking_flight", {
   cabinClass: text("cabin_class").notNull(),
   priceAmount: decimal("price_amount").notNull(),
   priceCurrency: text("price_currency").notNull(),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const passengerFlight = pgTable("passenger_flight", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   bookingFlightId: text("booking_flight_id")
     .notNull()
     .references(() => bookingFlight.id, { onDelete: "cascade" }),
@@ -169,21 +184,25 @@ export const passengerFlight = pgTable("passenger_flight", {
     .references(() => passenger.id, { onDelete: "cascade" }),
   seatNumber: text("seat_number"),
   baggageAllowance: text("baggage_allowance"),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const hotelRoom = pgTable("hotel_room", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   roomType: text("room_type").notNull(),
   description: text("description"),
   maxOccupancy: integer("max_occupancy").notNull(),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const bookingHotel = pgTable("booking_hotel", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   bookingId: text("booking_id")
     .notNull()
     .references(() => booking.id, { onDelete: "cascade" }),
@@ -200,12 +219,14 @@ export const bookingHotel = pgTable("booking_hotel", {
   numberOfRooms: integer("number_of_rooms").notNull(),
   pricePerNight: decimal("price_per_night").notNull(),
   priceCurrency: text("price_currency").notNull(),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const passengerRoom = pgTable("passenger_room", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   bookingHotelId: text("booking_hotel_id")
     .notNull()
     .references(() => bookingHotel.id, { onDelete: "cascade" }),
@@ -213,6 +234,6 @@ export const passengerRoom = pgTable("passenger_room", {
     .notNull()
     .references(() => passenger.id, { onDelete: "cascade" }),
   isPrimaryGuest: boolean("is_primary_guest").notNull(),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
