@@ -1,12 +1,9 @@
 import { eq } from "drizzle-orm";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import {
-  booking,
   flight,
   bookingFlight,
-  passenger,
   passengerFlight,
-  user,
 } from "./schema";
 import {
   FlightBookingResponse,

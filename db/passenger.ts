@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { passenger } from "./schema";
 import { uuid } from "drizzle-orm/pg-core";
-import { nanoid } from "nanoid";
 
 async function savePaymentInfo(
   db: PostgresJsDatabase,
@@ -12,7 +11,6 @@ async function savePaymentInfo(
     type passengerInfoInsert = typeof passenger.$inferInsert;
 
     const newPassengerInfo: passengerInfoInsert = {
-      id: uuid().toString(),
       userId: data.userId,
       firstName: data.first_name,
       lastName: data.lastName,
