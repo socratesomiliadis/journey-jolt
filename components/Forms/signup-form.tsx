@@ -37,6 +37,7 @@ export function SignupForm({
       email: email,
       password: password,
       name: name,
+      onboarding_complete: false,
     });
     if (error) {
       setError(error.message || "An error occurred");
@@ -121,7 +122,7 @@ export function SignupForm({
                 </div>
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? "Signing Up..." : "Sign Up"}
               </Button>
               {error && <p className="text-red-500">{error}</p>}
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">

@@ -41,8 +41,8 @@ export function AuthorizePayment({
         createdAt: new Date(),
       });
       append({
-        role: "assistant",
-        content: "Payment authorized",
+        role: "user",
+        content: "Finished payment authorization",
       });
     } else {
       toast.error("Invalid magic word");
