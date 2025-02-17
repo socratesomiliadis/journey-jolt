@@ -18,7 +18,7 @@ async function savePassengerInfo(
       nationality: data.nationality,
       passportNumber: data.passportNumber,
       passportExpiry: data.passportExpiry,
-      //alias: data.alias,
+      //alias: data.alias, 
     };
     console.log("Successfully saved passenger info: ", newPassengerInfo);
   } catch (error) {
