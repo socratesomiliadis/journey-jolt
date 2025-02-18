@@ -102,6 +102,18 @@ export default async function ChatPage() {
         },
       ],
     },
+    {
+      id: generateUUID(),
+      role: "assistant",
+      content: "Here are the passengers:",
+      toolInvocations: [
+        {
+          toolName: "getPassengers",
+          toolCallId: generateUUID(),
+          state: "result",
+        },
+      ],
+    },
   ];
   return (
     <Chat

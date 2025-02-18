@@ -16,7 +16,7 @@ export function Chat({
   id: string;
   initialMessages: Array<Message>;
 }) {
-  const { messages, handleSubmit, input, setInput, append, isLoading, stop } =
+  const { messages, handleSubmit, input, setInput, append, stop, status } =
     useChat({
       id,
       body: { id },
@@ -61,7 +61,7 @@ export function Chat({
             input={input}
             setInput={setInput}
             handleSubmit={handleSubmit}
-            isLoading={isLoading}
+            status={status}
             stop={stop}
             messages={messages}
             append={append}

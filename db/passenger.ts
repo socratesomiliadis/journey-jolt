@@ -2,8 +2,10 @@
 
 import { db } from ".";
 import { passenger } from "./schema";
+import { eq } from "drizzle-orm";
 
 type passengerInfoInsert = typeof passenger.$inferInsert;
+export type passengerInfoSelect = typeof passenger.$inferSelect;
 //saves passenger data to the database when called
 //is called at the passenger registration page
 export async function savePassengerInfo(
@@ -24,6 +26,23 @@ export async function savePassengerInfo(
     console.log("Successfully saved passenger info: ", newPassengerInfo);
   } catch (error) {
     console.error("Error saving passenger info:", error);
+    throw error;
+  }
+}
+
+export async function getPassengerInfo(
+  userId: string
+): Promise<passengerInfoSelect[]> {
+  console.log("userId", userId);
+  try {
+    const passengerInfo = await db
+      .select()
+      .from(passenger)
+      .where(eq(passenger.userId, userId));
+    console.log("passengerInfo", passengerInfo);
+    return passengerInfo;
+  } catch (error) {
+    console.error("Error getting passenger info:", error);
     throw error;
   }
 }

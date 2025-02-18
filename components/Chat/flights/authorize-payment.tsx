@@ -40,6 +40,14 @@ export function AuthorizePayment({
         hasCompletedPayment: true,
         createdAt: new Date(),
       });
+      localStorage.setItem(
+        intent.offerId,
+        JSON.stringify({
+          hasCompletedPayment: true,
+          createdAt: new Date(),
+        })
+      );
+
       append({
         role: "user",
         content: "Finished payment authorization",

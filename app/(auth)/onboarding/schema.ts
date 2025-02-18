@@ -11,8 +11,12 @@ const passengerSchema = z.object({
       message:
         "Passport number must be 6-9 characters long and not start with 0",
     }),
-  passportExpiry: z.string().min(1, "Passport expiry is required"),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  passportExpiry: z.date().refine((date) => date > new Date(), {
+    message: "Passport expiry must be in the future",
+  }),
+  dateOfBirth: z.date().refine((date) => date < new Date(), {
+    message: "Date of birth must be in the past",
+  }),
 });
 
 export const onboardingSchema = z.object({

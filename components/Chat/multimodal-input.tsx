@@ -21,9 +21,9 @@ import { Textarea } from "../ui/textarea";
 
 const suggestedActions = [
   {
-    title: "Help me book a flight",
+    title: "Help me book a trip",
     label: "from Thessaloniki to Dubai",
-    action: "Help me book a flight from Thessaloniki to Dubai",
+    action: "Help me book a trip from Thessaloniki to Dubai",
   },
   {
     title: "What is the status",
@@ -35,7 +35,7 @@ const suggestedActions = [
 export function MultimodalInput({
   input,
   setInput,
-  isLoading,
+  status,
   stop,
   messages,
   append,
@@ -43,7 +43,7 @@ export function MultimodalInput({
 }: {
   input: string;
   setInput: (value: string) => void;
-  isLoading: boolean;
+  status: "submitted" | "streaming" | "ready" | "error";
   stop: () => void;
   messages: Array<Message>;
   append: (
@@ -134,7 +134,7 @@ export function MultimodalInput({
           if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
 
-            if (isLoading) {
+            if (status === "streaming") {
               toast.error("Please wait for the model to finish its response!");
             } else {
               submitForm();
@@ -143,7 +143,7 @@ export function MultimodalInput({
         }}
       />
 
-      {isLoading ? (
+      {status === "streaming" ? (
         <Button
           className="rounded-full p-1.5 h-fit absolute bottom-2 right-2 m-0.5 text-white"
           onClick={(event) => {

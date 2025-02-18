@@ -14,6 +14,8 @@ export const env = createEnv({
     GOOGLE_REDIRECT_URI: z.string().min(1).url(),
     OPENAI_API_KEY: z.string().min(1),
     DUFFEL_TOKEN: z.string().min(1),
+    ENCRYPTION_KEY: z.string().min(1),
+    GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().min(1).url(),
