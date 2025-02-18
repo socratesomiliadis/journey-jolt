@@ -209,19 +209,11 @@ export default function PassengerList() {
                       </span>
                     </td>
                     <td className="text-right p-4">
-                      <div className="inline-flex items-center justify-center group/menu rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <Ellipsis
-                          className="ml-auto text-gray-400 group-hover/menu:text-gray-600 
-                          dark:text-gray-600/[1] dark:group-hover/menu:text-gray-300 
-                          transition-colors h-5 w-5"
-                        />
+                      <div className="inline-flex items-center justify-center group/menu rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <Ellipsis className="ml-auto text-gray-400 group-hover/menu:text-gray-600 dark:text-gray-600/[1] dark:group-hover/menu:text-gray-300 transition-colors h-5 w-5" />
                       </div>{" "}
-                      <div className="inline-flex items-center justify-center group/delete rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <Trash2
-                          className="ml-auto text-red-400 group-hover/delete:text-red-600 
-                          dark:text-red-600/[0.5] dark:group-hover/delete:text-red-700 
-                          transition-colors h-5 w-5"
-                        />
+                      <div className="inline-flex items-center justify-center group/delete rounded-lg p-2 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <Trash2 className="ml-auto text-red-400 group-hover/delete:text-red-600 dark:text-red-600/[0.5] dark:group-hover/delete:text-red-700 transition-colors h-5 w-5" />
                       </div>
                     </td>
                   </motion.tr>
