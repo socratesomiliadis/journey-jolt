@@ -2,7 +2,6 @@ import { format } from "date-fns";
 import { FlashlightIcon, PlaneTakeoffIcon } from "lucide-react";
 
 const SAMPLE = {
-  reservationId: "RES123456",
   flightNumber: "DL1",
   seat: "1C",
   departure: {
