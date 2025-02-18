@@ -9,6 +9,7 @@ import {
   Command,
   Frame,
   GalleryVerticalEnd,
+  Loader2,
   Map,
   PieChart,
   Settings2,
@@ -28,6 +29,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
+import { History } from "./Chat/history";
 
 const data = {
   navMain: [
@@ -77,7 +79,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
 
   const user = {
     name: session?.user.name || "",
@@ -86,6 +88,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   console.log(session);
+
+  if (isPending) {
+    return (
+      <Sidebar collapsible="icon" {...props}>
+        <span className="h-full w-full flex flex-row items-center justify-center group-data-[collapsible=icon]:gap-4 transition-all duration-300 ease-out text-black dark:text-white">
+          <Loader2 className="animate-spin" />
+        </span>
+      </Sidebar>
+    );
+  }
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -121,8 +133,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+        <History user={session?.user} />
       </SidebarContent>
-      <SidebarFooter className="pb-3">
+      <SidebarFooter className="pb-3.5">
         <NavUser user={user} />
       </SidebarFooter>
       {/* <SidebarRail /> */}

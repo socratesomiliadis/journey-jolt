@@ -22,9 +22,9 @@ export function Chat({
       body: { id },
       initialMessages,
       maxSteps: 10,
-      //   onFinish: () => {
-      //     window.history.replaceState({}, "", `/chat/${id}`);
-      //   },
+      onFinish: () => {
+        window.history.replaceState({}, "", `/dashboard/chat/${id}`);
+      },
     });
 
   const [messagesContainerRef, messagesEndRef] =

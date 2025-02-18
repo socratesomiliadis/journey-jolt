@@ -5,7 +5,7 @@ import {
 } from "@/ai/actions";
 import { authClient } from "@/lib/auth-client";
 import { google } from "@ai-sdk/google";
-import { streamText } from "ai";
+import { convertToCoreMessages, CoreMessage, streamText } from "ai";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { db } from "@/db";
@@ -16,6 +16,10 @@ import {
   createFlightBooking,
   createInitialBooking,
 } from "@/db/booking";
+import { openai } from "@ai-sdk/openai";
+import { saveChat } from "@/db/chats";
+
+const provider: "google" | "openai" = "google";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -35,20 +39,24 @@ export async function POST(req: Request) {
   // Extract the `messages` from the body of the request
   const { messages, id } = await req.json();
 
-  console.log("chat id", id); // can be used for persisting the chat
+  const coreMessages = convertToCoreMessages(messages).filter(
+    (message: CoreMessage) => message.content.length > 0
+  );
 
   // Call the language model
   const result = streamText({
-    model: google("gemini-2.0-flash-001"),
+    model:
+      provider === "google" ? google("gemini-2.0-flash-001") : openai("gpt-4o"),
     maxSteps: 10,
     maxRetries: 4,
     toolCallStreaming: true,
+
     system: `\n
       - you help users book flights and accommodations.
       - today's date is ${new Date().toLocaleDateString()}
       - your answers and questions must be concise and to the point.
       - DO NOT output lists or code blocks.
-      - you must use tools whenever possible.
+      - you have to use tools whenever possible.
       - you must not output/display lists of flights, seats, accommodations, etc.
       - ask follow up questions to nudge user into the optimal flow
       - ask questions to get the information you need to book the flights or accommodations
@@ -67,44 +75,43 @@ export async function POST(req: Request) {
         - number of rooms
       - here is the optimal flow:
         - ask the user if they want to book a one-way or round trip.
-        - use 'getPassengers' tool ask the user to select the passengers for the trip.
+        - use the 'getPassengers' tool to ask the user to select the passengers for the trip.
         - wait for the user to select the passengers.
-        - use 'createInitialBooking' tool to create the initial booking.
+        - use the 'createInitialBooking' tool to create the initial booking.
         - ask necessary questions to get the information you need to book the flights.
         - search for flights separately for each desired flight leg.
         - for each flight leg:
-          - use 'searchFlights' tool to find flights.
+          - use the 'searchFlights' tool to find flights.
           - ask the user to choose a flight, without outputting a list of flights.
           - use the 'selectSeats' tool to prompt the user for seat selection for each passenger.
           - wait for the user to select seats for all passengers and make sure they are available.
-          - use 'displayReservation' tool without outputting a list of details.
+          - use the 'displayReservation' tool without outputting a list of details.
           - ask if he wants to continue to payment or change something.
-          - use 'authorizePayment' tool if the user wants to continue to payment.
+          - use the 'authorizePayment' tool if the user wants to continue to payment.
           - wait for payment authorization.
-          - only after the user has authorized payment, use 'verifyPayment' tool to verify payment status.
-          - use 'displayBoardingPass' tool to display the boarding pass after the payment is verified.
-          - use 'createFlightBooking' tool to create the flight booking.
+          - only after the user has authorized payment, use the 'verifyPayment' tool to verify payment status.
+          - use the 'displayBoardingPass' tool to display the boarding pass after the payment is verified.
+          - use the 'createFlightBooking' tool to create the flight booking.
         - after the user has completed booking the flight or flights, you must ask if they want to book accommodations at their destination.
         - if they want to book accommodations, ask necessary questions to get the information you need to book the accommodations.
         - for accommodation booking:
           - ask if check in and check out dates are the same as the flight dates or not.
           - if they are not, ask for the check in and check out dates.
-          - use 'searchAccommodations' tool to find accommodations.
+          - use the 'searchAccommodations' tool to find accommodations.
           - ask the user to choose an accommodation, without outputting a list of accommodations.
-          - use 'authorizePayment' tool
+          - use the 'authorizePayment' tool
           - wait for payment authorization.
-          - use 'verifyPayment' tool to verify payment status.
+          - use the 'verifyPayment' tool to verify payment status.
           - only after payment authorization is complete and you have verified the payment, confirm the booking details.
-          - use 'createAccommodationBooking' tool to create the accommodation booking.
+          - use the 'createAccommodationBooking' tool to create the accommodation booking.
         - only after the booking is created, congratulate the user and say that the booking is complete and some basic details about the booking.
     `,
-
-    messages,
+    messages: coreMessages,
     tools: {
       getPassengers: {
         description: "Get passengers associated with the user",
         parameters: z.object({
-          userId: z.string().describe("User ID"),
+          todaysDate: z.string().describe("Today's date in ISO 8601 format"),
         }),
         execute: async () => {
           const passengers = await db
@@ -272,8 +279,8 @@ export async function POST(req: Request) {
           flightNumber: z.string().describe("Flight number"),
           departureAirport: z.string().describe("Departure airport"),
           arrivalAirport: z.string().describe("Arrival airport"),
-          departureTime: z.string().describe("Departure time"),
-          arrivalTime: z.string().describe("Arrival time"),
+          departureDateTime: z.string().describe("Departure date and time"),
+          arrivalDateTime: z.string().describe("Arrival date and time"),
         }),
         execute: async ({
           bookingId,
@@ -284,8 +291,8 @@ export async function POST(req: Request) {
           flightNumber,
           departureAirport,
           arrivalAirport,
-          departureTime,
-          arrivalTime,
+          departureDateTime,
+          arrivalDateTime,
         }) => {
           const bId = await createFlightBooking({
             bookingId,
@@ -296,8 +303,8 @@ export async function POST(req: Request) {
             flightNumber,
             departureAirport,
             arrivalAirport,
-            departureTime,
-            arrivalTime,
+            departureDateTime,
+            arrivalDateTime,
           });
           return bId;
         },
@@ -373,12 +380,30 @@ export async function POST(req: Request) {
     async onError(error) {
       console.error("Error", error);
     },
-    async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
+    async onFinish({
+      text,
+      toolCalls,
+      toolResults,
+      usage,
+      finishReason,
+      response,
+    }) {
       console.log("text", text);
       console.log("finishReason", finishReason);
       console.log("toolCalls", toolCalls);
       console.log("toolResults", toolResults);
       console.log("usage", usage);
+      if (session.user && session.user.id) {
+        try {
+          await saveChat({
+            id,
+            messages: [...coreMessages, ...response.messages],
+            userId: session.user.id,
+          });
+        } catch (error) {
+          console.error("Failed to save chat");
+        }
+      }
     },
   });
 

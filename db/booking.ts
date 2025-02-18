@@ -51,6 +51,7 @@ export async function createInitialBooking({
     totalAmount: "0",
     currency: "EUR",
     paymentStatus: "pending",
+    startingDate: "n/a",
   };
 
   try {
@@ -83,8 +84,8 @@ export async function createFlightBooking({
   flightNumber,
   departureAirport,
   arrivalAirport,
-  departureTime,
-  arrivalTime,
+  departureDateTime,
+  arrivalDateTime,
 }: {
   bookingId: string;
   cabinClass: string;
@@ -94,8 +95,8 @@ export async function createFlightBooking({
   flightNumber: string;
   departureAirport: string;
   arrivalAirport: string;
-  departureTime: string;
-  arrivalTime: string;
+  departureDateTime: string;
+  arrivalDateTime: string;
 }) {
   let initialBooking: bookingSelect[];
   try {
@@ -121,8 +122,8 @@ export async function createFlightBooking({
     airline,
     departureAirport,
     arrivalAirport,
-    departureTime,
-    arrivalTime,
+    departureDateTime,
+    arrivalDateTime,
   };
 
   //Update the booking type
@@ -233,6 +234,7 @@ export async function getBookings(userId: string) {
         totalAmount: booking.totalAmount,
         currency: booking.currency,
         paymentStatus: booking.paymentStatus,
+        startingDate: booking.startingDate,
         createdAt: booking.createdAt,
         updatedAt: booking.updatedAt,
         booking_flights: bookingFlight,
@@ -311,22 +313,24 @@ export async function getBookings(userId: string) {
   }
 
   function isFutureBooking(
-  booking: bookingSelectWithFlightAndAccommodation,
-  now: Date
-): boolean {
-  // Check flights
-  const hasFutureFlights = booking.booking_flights.some((flight) => {
-    return new Date(flight.departureTime) > now;
-  });
+    booking: bookingSelectWithFlightAndAccommodation,
+    now: Date
+  ): boolean {
+    // Check flights
+    const hasFutureFlights = booking.booking_flights.some((flight) => {
+      return new Date(flight.departureDateTime) > now;
+    });
 
-  // Check accommodations
-  const hasFutureAccommodations = booking.booking_accommodations.some((accommodation) => {
-    return new Date(accommodation.checkOutDate) > now;
-  });
+    // Check accommodations
+    const hasFutureAccommodations = booking.booking_accommodations.some(
+      (accommodation) => {
+        return new Date(accommodation.checkOutDate) > now;
+      }
+    );
 
-  // A booking is considered future if either its flights or accommodations are in the future
-  return hasFutureFlights || hasFutureAccommodations;
-}
+    // A booking is considered future if either its flights or accommodations are in the future
+    return hasFutureFlights || hasFutureAccommodations;
+  }
 }
 
 export async function deleteBookingInfo(bookingId: string): Promise<void> {

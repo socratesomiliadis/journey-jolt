@@ -31,6 +31,7 @@ const Beam = ({
 
   return (
     <motion.div
+      suppressHydrationWarning
       style={
         {
           "--x": `${x}`,

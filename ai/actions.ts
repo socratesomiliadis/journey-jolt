@@ -3,6 +3,9 @@ import { Duffel } from "@duffel/api";
 import { env } from "@/lib/env";
 import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
+import { openai } from "@ai-sdk/openai";
+
+const provider: "google" | "openai" = "google";
 
 const duffel = new Duffel({
   token: env.DUFFEL_TOKEN,
@@ -222,7 +225,10 @@ export async function generateSampleSeatSelection({
   flightNumber: string;
 }) {
   const { object: rows } = await generateObject({
-    model: google("gemini-2.0-flash-001"),
+    model:
+      provider === "google"
+        ? google("gemini-2.0-flash-001")
+        : openai("gpt-4o-mini"),
     prompt: `Simulate available seats for flight number ${flightNumber}, 6 seats on each row and 5 rows in total, adjust pricing based on location of seat, randomize availability of seats`,
     output: "array",
     schema: z.array(
@@ -277,7 +283,10 @@ export async function generateAccommodationSearchResults({
   checkOutDate: string;
 }) {
   const { object: accommodations } = await generateObject({
-    model: google("gemini-2.0-flash-001"),
+    model:
+      provider === "google"
+        ? google("gemini-2.0-flash-001")
+        : openai("gpt-4o-mini"),
     prompt: `Generate a list of 3-7 accommodations in ${destinationCity}, ${destinationCountry} for the dates ${checkInDate} to ${checkOutDate} follow the schema CAREFULLY`,
     output: "array",
     schema: z.object({

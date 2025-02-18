@@ -6,8 +6,11 @@ import {
   boolean,
   decimal,
   varchar,
+  json,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
+import { InferSelectModel } from "drizzle-orm";
+import { Message } from "ai";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -59,6 +62,21 @@ export const verification = pgTable("verification", {
   createdAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at"),
 });
+
+export const chat = pgTable("chat", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
+  createdAt: timestamp("created_at").notNull(),
+  messages: json("messages").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
+export type Chat = Omit<InferSelectModel<typeof chat>, "messages"> & {
+  messages: Array<Message>;
+};
 
 export const paymentInfo = pgTable("payment_info", {
   id: text("id")
@@ -121,6 +139,7 @@ export const booking = pgTable("booking", {
   totalAmount: decimal("total_amount").notNull(),
   currency: text("currency").notNull(),
   paymentStatus: text("payment_status").notNull(),
+  startingDate: text("starting_date").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -154,8 +173,8 @@ export const bookingFlight = pgTable("booking_flight", {
   airline: text("airline").notNull(),
   departureAirport: text("departure_airport").notNull(),
   arrivalAirport: text("arrival_airport").notNull(),
-  departureTime: text("departure_time").notNull(),
-  arrivalTime: text("arrival_time").notNull(),
+  departureDateTime: text("departure_date_time").notNull(),
+  arrivalDateTime: text("arrival_date_time").notNull(),
   aircraftType: text("aircraft_type"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
