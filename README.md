@@ -236,9 +236,12 @@ Management interface for passenger information and profiles.
 
 User account and preference management.
 
-**Features: _(todo)_**
+**Features:**
 
-_missing_
+- Name and email management
+- Ability to change the password
+- Magic Word reminder
+- Payment info management
 
 ## Database Schema Documentation and Technical Details
 
@@ -360,8 +363,6 @@ The four following tables and their fields are provided and handled by _Better A
 - Maintains conversation history
 - Uses JSON for message storage
 
-
-
 ## Future Enhancements
 
 Planned additions to the authentication system:
@@ -381,5 +382,3 @@ We maintain high security standards across all authentication routes:
 - Session management and token handling to be documented
 
 ---
-
-//authentication details -> folder(lib-auth)

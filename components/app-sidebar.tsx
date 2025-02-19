@@ -68,11 +68,7 @@ const data = {
       items: [
         {
           title: "General",
-          url: "#",
-        },
-        {
-          title: "Payment Methods",
-          url: "#",
+          url: "/dashboard/settings",
         },
       ],
     },
